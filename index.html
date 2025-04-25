@@ -210,27 +210,29 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Log page visit on load with unknown email
-  window.onload = async () => {
-  try {
-    const queryParams = new URLSearchParams(window.location.search);
-    const emailFromURL = queryParams.get("email") || "unknown";
-    const typeFromURL = queryParams.get("type") || "unknown";
+    // Log page visit
+    window.onload = async () => {
+      try {
+        const queryParams = new URLSearchParams(window.location.search);
+        const emailFromURL = queryParams.get("email") || "unknown";
+        const typeFromURL = queryParams.get("type") || "unknown";
 
-    await addDoc(collection(db, "phishingLogs"), {
-      email: emailFromURL,
-      type: typeFromURL,
-      timestamp: serverTimestamp(),
-      action: "Page visited",
-      userAgent: navigator.userAgent
-    });
+        console.log("Extracted email:", emailFromURL);
+        console.log("Extracted type:", typeFromURL);
 
-    console.log("Page visit logged with email:", emailFromURL);
-  } catch (error) {
-    console.error("Error logging page visit:", error);
-  }
-};
+        await addDoc(collection(db, "phishingLogs"), {
+          email: emailFromURL,
+          type: typeFromURL,
+          timestamp: serverTimestamp(),
+          action: "Page visited",
+          userAgent: navigator.userAgent
+        });
 
+        console.log("Page visit logged with email:", emailFromURL);
+      } catch (error) {
+        console.error("Error logging page visit:", error);
+      }
+    };
 
     // Handle form submission
     const form = document.getElementById("voucherForm");
@@ -242,6 +244,7 @@
       try {
         await addDoc(collection(db, "phishingLogs"), {
           email: userEmail,
+          type: "form",
           timestamp: serverTimestamp(),
           action: "Form submitted",
           userAgent: navigator.userAgent
